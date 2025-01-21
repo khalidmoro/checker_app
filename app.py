@@ -18,7 +18,7 @@ from phonenumbers import geocoder, carrier, timezone
 app = Flask(__name__)
 
 # Configuración de APIs
-SHODAN_API_KEY = "TDZMYTxvOzdfX3MOKnhtaw0dStdzs3fpW"
+SHODAN_API_KEY = "Your_API_HERE"
 
 def init_db():
     conn = sqlite3.connect('searches.db')
