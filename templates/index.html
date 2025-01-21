@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checker App Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .result-card {
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .platform-icon {
+            font-size: 24px;
+            margin: 10px;
+            display: inline-block;
+            width: 120px;
+            text-align: center;
+            vertical-align: top;
+            transition: transform 0.2s;
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .platform-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .platform-icon i {
+            font-size: 32px;
+            margin-bottom: 5px;
+            display: block;
+            color: #28a745;
+        }
+        .platform-name {
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+            color: #1b5e20;
+            font-weight: bold;
+        }
+        .platform-link {
+            font-size: 11px;
+            display: block;
+            word-break: break-all;
+            color: #007bff;
+            text-decoration: none;
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .platform-link:hover {
+            background: #f8f9fa;
+            color: #0056b3;
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .platforms-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .password-leak-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .password-leak-alert.found {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .category-title {
+            margin: 20px 0;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            text-align: center;
+            color: #1b5e20;
+            font-weight: bold;
+        }
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        .vuln-section, .leak-section {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .vulnerability-item {
+            background: #fff3cd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+        .service-item {
+            background: #e8f5e9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+        }
+        .dns-record {
+            background: #e3f2fd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #2196f3;
+        }
+        .breach-item {
+            background: #ffebee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #f44336;
+        }
+        .cvss-score {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .cvss-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .cvss-medium {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        .cvss-low {
+            background: #f1f8e9;
+            color: #33691e;
+        }
+        .phone-section {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .phone-info-item {
+            background: #e3f2fd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #1976d2;
+        }
+        .phone-social-item {
+            background: #e8f5e9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #43a047;
+        }
+        .phone-leak-item {
+            background: #ffebee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #e53935;
+        }
+        .phone-record-item {
+            background: #f3e5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #8e24aa;
+        }
+        .security-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 2px;
+        }
+        
+        .badge-safe {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .badge-warning {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .badge-danger {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .activity-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .active {
+            background-color: #4caf50;
+        }
+        
+        .inactive {
+            background-color: #f44336;
+        }
+        
+        .telegram-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #0088cc;
+        }
+        
+        .telegram-item h6 {
+            color: #0088cc;
+        }
+        
+        .telegram-section {
+            margin-bottom: 30px;
+        }
+        
+        .footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: auto;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🔍 Checker App Pro</h1>
+        
+        <div class="card p-4 mb-4">
+            <form id="checkForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Usuario o Email:</label>
+                    <input type="text" class="form-control" id="email" name="email" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Buscar Información</button>
+            </form>
+        </div>
+
+        <div id="loading" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Buscando...</span>
+            </div>
+            <p class="mt-2">Buscando en múltiples plataformas...</p>
+        </div>
+
+        <div id="results">
+            <!-- Vulnerabilities Section -->
+            <div class="result-card d-none" id="vulnerabilitiesCard">
+                <h4 class="category-title">Vulnerabilidades Encontradas</h4>
+                <div id="vulnerabilitiesResults">
+                    <!-- Shodan Results -->
+                    <div class="vuln-section mb-4">
+                        <h5 class="text-danger mb-3">🔍 Análisis de Infraestructura</h5>
+                        <div id="shodanResults"></div>
+                    </div>
+                    
+                    <!-- Domain Info -->
+                    <div class="vuln-section mb-4">
+                        <h5 class="text-primary mb-3">🌐 Información del Dominio</h5>
+                        <div id="domainResults"></div>
+                    </div>
+                    
+                    <!-- DNS Records -->
+                    <div class="vuln-section mb-4">
+                        <h5 class="text-info mb-3">📡 Registros DNS</h5>
+                        <div id="dnsResults"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Leaks Section -->
+            <div class="result-card d-none" id="dataLeaksCard">
+                <h4 class="category-title">Filtraciones de Datos</h4>
+                <div id="dataLeaksResults">
+                    <!-- Email Breaches -->
+                    <div class="leak-section mb-4">
+                        <h5 class="text-warning mb-3">⚠️ Filtraciones de Email</h5>
+                        <div id="emailBreachResults"></div>
+                    </div>
+                    
+                    <!-- Pastebin Leaks -->
+                    <div class="leak-section mb-4">
+                        <h5 class="text-warning mb-3">📄 Filtraciones en Pastebin</h5>
+                        <div id="pastebinResults"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Leaks -->
+            <div class="result-card d-none" id="passwordLeaksCard">
+                <h4 class="text-center mb-4">Verificación de Seguridad</h4>
+                <div id="passwordLeaksResults"></div>
+            </div>
+
+            <!-- Social Media Results -->
+            <div class="result-card d-none" id="socialMediaCard">
+                <h4 class="category-title">Perfiles Encontrados en Redes Sociales</h4>
+                <div id="socialMediaResults" class="platforms-container"></div>
+            </div>
+
+            <!-- Gaming Platforms -->
+            <div class="result-card d-none" id="gamingCard">
+                <h4 class="category-title">Perfiles Encontrados en Plataformas de Juegos</h4>
+                <div id="gamingResults" class="platforms-container"></div>
+            </div>
+
+            <!-- Crypto Platforms Results -->
+            <div class="result-card d-none" id="cryptoCard">
+                <h4 class="category-title">Perfiles Encontrados en Plataformas de Criptomonedas</h4>
+                <div id="cryptoResults" class="platforms-container"></div>
+            </div>
+
+            <!-- Tech Platforms -->
+            <div class="result-card d-none" id="techCard">
+                <h4 class="category-title">Perfiles Encontrados en Plataformas Técnicas</h4>
+                <div id="techResults" class="platforms-container"></div>
+            </div>
+
+            <!-- IP Info -->
+            <div class="result-card d-none" id="ipCard">
+                <h4 class="category-title">Información de IP</h4>
+                <div id="ipResults"></div>
+            </div>
+
+            <!-- Phone Number Results -->
+            <div class="result-card d-none" id="phoneCard">
+                <h4 class="category-title">Información del Número Telefónico</h4>
+                <div id="phoneResults">
+                    <!-- Basic Info -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-primary mb-3">📱 Información Básica</h5>
+                        <div id="phoneBasicInfo"></div>
+                    </div>
+
+                    <!-- Location Info -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-success mb-3">🌍 Ubicación y Detalles</h5>
+                        <div id="phoneLocationInfo"></div>
+                    </div>
+
+                    <!-- Security Analysis -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-warning mb-3">🔒 Análisis de Seguridad</h5>
+                        <div id="phoneSecurityInfo"></div>
+                    </div>
+
+                    <!-- Reputation Info -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-danger mb-3">⚠️ Reputación</h5>
+                        <div id="phoneReputationInfo"></div>
+                    </div>
+
+                    <!-- Activity Status -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-info mb-3">📱 Actividad en Servicios</h5>
+                        <div id="phoneActivityInfo"></div>
+                    </div>
+                    
+                    <!-- Social Media -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-success mb-3">🌐 Redes Sociales</h5>
+                        <div id="phoneSocialMedia"></div>
+                    </div>
+                    
+                    <!-- Public Records -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-info mb-3">📖 Registros Públicos</h5>
+                        <div id="phonePublicRecords"></div>
+                    </div>
+                    
+                    <!-- Data Leaks -->
+                    <div class="phone-section mb-4">
+                        <h5 class="text-danger mb-3">⚠️ Filtraciones Detectadas</h5>
+                        <div id="phoneLeaks"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telegram Results -->
+            <div class="result-card d-none" id="telegramCard">
+                <h4 class="category-title">🌐 Resultados de Telegram</h4>
+                
+                <!-- Canales -->
+                <div class="telegram-section mb-4">
+                    <h5 class="text-primary mb-3">📢 Canales Públicos</h5>
+                    <div id="telegramChannels"></div>
+                </div>
+                
+                <!-- Bots -->
+                <div class="telegram-section mb-4">
+                    <h5 class="text-success mb-3">🤖 Bots</h5>
+                    <div id="telegramBots"></div>
+                </div>
+                
+                <!-- Stickers -->
+                <div class="telegram-section mb-4">
+                    <h5 class="text-info mb-3">😀 Stickers</h5>
+                    <div id="telegramStickers"></div>
+                </div>
+            </div>
+
+            <!-- No Results Message -->
+            <div id="noResultsMessage" class="result-card d-none">
+                <p class="no-results">No se encontraron perfiles para este usuario.</p>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="result-card mt-4 d-none" id="historyCard">
+            <h4>Historial de Búsquedas</h4>
+            <div id="searchHistory"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-3 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-0">Coded by WiFiway (g5y@hotmail.com)</p>
+        </div>
+    </footer>
+
+    <script>
+        const platformIcons = {
+            'Instagram': 'fab fa-instagram',
+            'Facebook': 'fab fa-facebook',
+            'Twitter': 'fab fa-twitter',
+            'TikTok': 'fab fa-tiktok',
+            'LinkedIn': 'fab fa-linkedin',
+            'Pinterest': 'fab fa-pinterest',
+            'Reddit': 'fab fa-reddit',
+            'GitHub': 'fab fa-github',
+            'YouTube': 'fab fa-youtube',
+            'Twitch': 'fab fa-twitch',
+            'Steam': 'fab fa-steam',
+            'Medium': 'fab fa-medium',
+            'DeviantArt': 'fab fa-deviantart',
+            'Vimeo': 'fab fa-vimeo',
+            'SoundCloud': 'fab fa-soundcloud',
+            'Behance': 'fab fa-behance',
+            'Flickr': 'fab fa-flickr',
+            'VK': 'fab fa-vk',
+            'Telegram': 'fab fa-telegram',
+            'Discord': 'fab fa-discord',
+            'WhatsApp': 'fab fa-whatsapp',
+            'Skype': 'fab fa-skype',
+            'OnlyFans': 'fas fa-star',
+            'Snapchat': 'fab fa-snapchat',
+            'WeChat': 'fab fa-weixin',
+            'Line': 'fab fa-line',
+            'Tumblr': 'fab fa-tumblr',
+            'Mastodon': 'fab fa-mastodon',
+            'Quora': 'fab fa-quora',
+            'Stack Overflow': 'fab fa-stack-overflow',
+            'GitLab': 'fab fa-gitlab',
+            'Bitbucket': 'fab fa-bitbucket',
+            'Docker Hub': 'fab fa-docker',
+            'NPM': 'fab fa-npm',
+            'CodePen': 'fab fa-codepen',
+            'Dev.to': 'fab fa-dev'
+        };
+
+        function createPlatformElement(platform, data) {
+            if (!data.exists) return null;
+            
+            const platformDiv = document.createElement('div');
+            platformDiv.className = 'platform-icon';
+            
+            const icon = document.createElement('i');
+            icon.className = platformIcons[platform] || 'fas fa-globe';
+            
+            const name = document.createElement('span');
+            name.className = 'platform-name';
+            name.textContent = platform;
+
+            const link = document.createElement('a');
+            link.href = data.url;
+            link.className = 'platform-link';
+            link.textContent = 'Ver perfil';
+            link.target = '_blank';
+            
+            platformDiv.appendChild(icon);
+            platformDiv.appendChild(name);
+            platformDiv.appendChild(link);
+            
+            return platformDiv;
+        }
+
+        document.getElementById('checkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('loading');
+            const email = document.getElementById('email').value;
+            let foundAnyResults = false;
+
+            // Hide all result cards
+            document.querySelectorAll('.result-card').forEach(card => {
+                card.classList.add('d-none');
+            });
+
+            loading.classList.remove('d-none');
+
+            try {
+                const response = await fetch('/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Display Password Leaks only if found
+                    if (data.password_leaks && data.password_leaks.found) {
+                        const leaksDiv = document.getElementById('passwordLeaksResults');
+                        leaksDiv.innerHTML = `
+                            <div class="password-leak-alert found">
+                                <h5>⚠️ ¡Alerta de Seguridad!</h5>
+                                <p>${data.password_leaks.message}</p>
+                                <p>Recomendamos cambiar inmediatamente las contraseñas en todas las plataformas.</p>
+                            </div>
+                        `;
+                        document.getElementById('passwordLeaksCard').classList.remove('d-none');
+                        foundAnyResults = true;
+                    }
+
+                    // Display only found profiles for each category
+                    const categories = {
+                        'social_media': ['socialMediaResults', 'socialMediaCard'],
+                        'gaming_platforms': ['gamingResults', 'gamingCard'],
+                        'crypto_platforms': ['cryptoResults', 'cryptoCard'],
+                        'tech_platforms': ['techResults', 'techCard']
+                    };
+
+                    for (const [category, [resultsDivId, cardId]] of Object.entries(categories)) {
+                        if (data[category]) {
+                            const resultsDiv = document.getElementById(resultsDivId);
+                            resultsDiv.innerHTML = '';
+                            let foundInCategory = false;
+
+                            for (const [platform, platformData] of Object.entries(data[category])) {
+                                if (platformData.exists) {
+                                    const element = createPlatformElement(platform, platformData);
+                                    if (element) {
+                                        resultsDiv.appendChild(element);
+                                        foundInCategory = true;
+                                        foundAnyResults = true;
+                                    }
+                                }
+                            }
+
+                            if (foundInCategory) {
+                                document.getElementById(cardId).classList.remove('d-none');
+                            }
+                        }
+                    }
+
+                    // Display IP Info
+                    if (data.ip_info && Object.keys(data.ip_info).length > 0) {
+                        const ipDiv = document.getElementById('ipResults');
+                        ipDiv.innerHTML = `
+                            <div class="text-center">
+                                <p><strong>País:</strong> ${data.ip_info.country_name || 'N/A'}</p>
+                                <p><strong>Ciudad:</strong> ${data.ip_info.city || 'N/A'}</p>
+                                <p><strong>ISP:</strong> ${data.ip_info.org || 'N/A'}</p>
+                            </div>
+                        `;
+                        document.getElementById('ipCard').classList.remove('d-none');
+                    }
+
+                    // Display new vulnerability and security information
+                    if (data.shodan_info) {
+                        displayVulnerabilities(data.shodan_info);
+                    }
+                    
+                    if (data.domain_info) {
+                        displayDomainInfo(data.domain_info);
+                    }
+                    
+                    if (data.email_breaches || data.pastebin_leaks) {
+                        displayDataLeaks(data.email_breaches, data.pastebin_leaks);
+                    }
+
+                    // Display Phone Number Results
+                    if (data.type === 'phone' && data.phone_info) {
+                        displayPhoneResults(data.phone_info);
+                    }
+
+                    // Show no results message if nothing was found
+                    if (!foundAnyResults) {
+                        document.getElementById('noResultsMessage').classList.remove('d-none');
+                    }
+                }
+            } catch (error) {
+                alert('Error al procesar la solicitud');
+            } finally {
+                loading.classList.add('d-none');
+            }
+        });
+
+        function displayVulnerabilities(data) {
+            if (!data) return;
+            
+            const shodanDiv = document.getElementById('shodanResults');
+            let shodanHtml = '';
+            
+            // Display Services
+            if (data.services && data.services.length > 0) {
+                shodanHtml += '<h6>Servicios Detectados:</h6>';
+                data.services.forEach(service => {
+                    shodanHtml += `
+                        <div class="service-item">
+                            <strong>${service.name}</strong> ${service.version ? `(${service.version})` : ''}
+                            ${service.port ? `- Puerto ${service.port}` : ''}
+                        </div>
+                    `;
+                });
+            }
+            
+            // Display Vulnerabilities
+            if (data.vulnerabilities && data.vulnerabilities.length > 0) {
+                shodanHtml += '<h6 class="mt-3">Vulnerabilidades:</h6>';
+                data.vulnerabilities.forEach(vuln => {
+                    const cvssClass = vuln.cvss >= 7 ? 'cvss-high' : 
+                                    vuln.cvss >= 4 ? 'cvss-medium' : 'cvss-low';
+                    shodanHtml += `
+                        <div class="vulnerability-item">
+                            <strong>${vuln.id}</strong>
+                            <span class="cvss-score ${cvssClass}">CVSS: ${vuln.cvss}</span>
+                            <p class="mb-0 mt-2">${vuln.summary}</p>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (shodanHtml) {
+                shodanDiv.innerHTML = shodanHtml;
+                document.getElementById('vulnerabilitiesCard').classList.remove('d-none');
+            }
+        }
+
+        function displayDomainInfo(data) {
+            if (!data) return;
+            
+            const domainDiv = document.getElementById('domainResults');
+            const dnsDiv = document.getElementById('dnsResults');
+            
+            // Display Domain Information
+            domainDiv.innerHTML = `
+                <div class="vuln-section">
+                    <p><strong>Registrador:</strong> ${data.registrar || 'N/A'}</p>
+                    <p><strong>Fecha de Creación:</strong> ${data.creation_date || 'N/A'}</p>
+                    <p><strong>Fecha de Expiración:</strong> ${data.expiration_date || 'N/A'}</p>
+                </div>
+            `;
+            
+            // Display DNS Records
+            if (data.dns_records) {
+                let dnsHtml = '';
+                for (const [type, records] of Object.entries(data.dns_records)) {
+                    if (records.length > 0) {
+                        dnsHtml += `
+                            <div class="dns-record">
+                                <strong>${type}:</strong>
+                                <ul class="mb-0">
+                                    ${records.map(record => `<li>${record}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
+                dnsDiv.innerHTML = dnsHtml;
+            }
+            
+            document.getElementById('vulnerabilitiesCard').classList.remove('d-none');
+        }
+
+        function displayDataLeaks(breaches, pastebinLeaks) {
+            const emailBreachDiv = document.getElementById('emailBreachResults');
+            const pastebinDiv = document.getElementById('pastebinResults');
+            let hasLeaks = false;
+            
+            // Display Email Breaches
+            if (breaches && breaches.found) {
+                let breachHtml = `
+                    <div class="alert alert-danger">
+                        <h6>⚠️ ${breaches.message}</h6>
+                    </div>
+                `;
+                
+                if (breaches.breaches.length > 0) {
+                    breachHtml += '<div class="mt-3">';
+                    breaches.breaches.forEach(breach => {
+                        breachHtml += `
+                            <div class="breach-item">
+                                <h6>${breach.Name}</h6>
+                                <p class="mb-1">${breach.Description}</p>
+                                <small>Fecha: ${breach.BreachDate}</small>
+                            </div>
+                        `;
+                    });
+                    breachHtml += '</div>';
+                }
+                
+                emailBreachDiv.innerHTML = breachHtml;
+                hasLeaks = true;
+            }
+            
+            // Display Pastebin Leaks
+            if (pastebinLeaks && pastebinLeaks.length > 0) {
+                let pastebinHtml = '<div class="mt-3">';
+                pastebinLeaks.forEach(leak => {
+                    pastebinHtml += `
+                        <div class="breach-item">
+                            <strong>${leak.title || 'Filtración encontrada'}</strong>
+                            <br>
+                            <a href="${leak.url}" target="_blank" class="text-danger">Ver contenido</a>
+                        </div>
+                    `;
+                });
+                pastebinHtml += '</div>';
+                
+                pastebinDiv.innerHTML = pastebinHtml;
+                hasLeaks = true;
+            }
+            
+            if (hasLeaks) {
+                document.getElementById('dataLeaksCard').classList.remove('d-none');
+            }
+        }
+
+        function displayPhoneResults(data) {
+            if (!data || !data.valid) return;
+            
+            // Basic Info
+            const basicInfoDiv = document.getElementById('phoneBasicInfo');
+            basicInfoDiv.innerHTML = `
+                <div class="phone-info-item">
+                    <p><strong>Número:</strong> ${data.formatted}</p>
+                    <p><strong>Estado:</strong> ${data.location.valid ? 
+                        '<span class="security-badge badge-safe">Válido</span>' : 
+                        '<span class="security-badge badge-danger">Inválido</span>'}</p>
+                    <p><strong>Tipo:</strong> ${data.location.line_type}</p>
+                </div>
+            `;
+            
+            // Location Info
+            const locationDiv = document.getElementById('phoneLocationInfo');
+            locationDiv.innerHTML = `
+                <div class="phone-info-item">
+                    <p><strong>País:</strong> ${data.location.country}</p>
+                    <p><strong>Región:</strong> ${data.location.region || 'No disponible'}</p>
+                    <p><strong>Operador:</strong> ${data.location.carrier || 'No disponible'}</p>
+                    <p><strong>Zona Horaria:</strong> ${data.location.timezone.join(', ')}</p>
+                </div>
+            `;
+
+            // Security Analysis
+            const securityDiv = document.getElementById('phoneSecurityInfo');
+            securityDiv.innerHTML = `
+                <div class="phone-info-item">
+                    ${data.security.trusted ? 
+                        '<span class="security-badge badge-safe">Número Confiable</span>' : 
+                        '<span class="security-badge badge-warning">Verificación Recomendada</span>'}
+                    ${data.security.voip ? 
+                        '<span class="security-badge badge-warning">VoIP</span>' : ''}
+                    ${data.security.premium ? 
+                        '<span class="security-badge badge-danger">Tarificación Premium</span>' : ''}
+                </div>
+            `;
+
+            // Reputation Info
+            const reputationDiv = document.getElementById('phoneReputationInfo');
+            if (data.reputation && data.reputation.length > 0) {
+                let reputationHtml = '<div class="phone-info-item">';
+                data.reputation.forEach(rep => {
+                    reputationHtml += `
+                        <div class="mb-2">
+                            <span class="security-badge badge-warning">Reportado como Spam</span>
+                            <br>
+                            <a href="${rep.url}" target="_blank" class="text-danger">Ver reporte</a>
+                        </div>
+                    `;
+                });
+                reputationHtml += '</div>';
+                reputationDiv.innerHTML = reputationHtml;
+            } else {
+                reputationDiv.innerHTML = `
+                    <div class="phone-info-item">
+                        <span class="security-badge badge-safe">Sin reportes negativos</span>
+                    </div>
+                `;
+            }
+
+            // Activity Status
+            const activityDiv = document.getElementById('phoneActivityInfo');
+            if (data.activity && data.activity.length > 0) {
+                let activityHtml = '<div class="phone-info-item">';
+                data.activity.forEach(act => {
+                    activityHtml += `
+                        <div class="mb-2">
+                            <span class="activity-indicator active"></span>
+                            <strong>${act.service}</strong>
+                            <br>
+                            <a href="${act.url}" target="_blank" class="text-success">Abrir</a>
+                        </div>
+                    `;
+                });
+                activityHtml += '</div>';
+                activityDiv.innerHTML = activityHtml;
+            } else {
+                activityDiv.innerHTML = '<p class="text-muted">No se detectó actividad en servicios</p>';
+            }
+            
+            // Social Media
+            const socialMediaDiv = document.getElementById('phoneSocialMedia');
+            if (data.social_media && Object.keys(data.social_media).length > 0) {
+                let socialHtml = '';
+                for (const [platform, info] of Object.entries(data.social_media)) {
+                    socialHtml += `
+                        <div class="phone-social-item">
+                            <strong>${platform}</strong>
+                            <br>
+                            <a href="${info.url}" target="_blank" class="text-success">Ver perfil</a>
+                        </div>
+                    `;
+                }
+                socialMediaDiv.innerHTML = socialHtml;
+            } else {
+                socialMediaDiv.innerHTML = '<p class="text-muted">No se encontraron perfiles en redes sociales</p>';
+            }
+            
+            // Public Records
+            const recordsDiv = document.getElementById('phonePublicRecords');
+            if (data.public_records && data.public_records.length > 0) {
+                let recordsHtml = '';
+                data.public_records.forEach(record => {
+                    recordsHtml += `
+                        <div class="phone-record-item">
+                            <strong>${new URL(record.source).hostname}</strong>
+                            <br>
+                            <a href="${record.url}" target="_blank" class="text-primary">Ver registro</a>
+                        </div>
+                    `;
+                });
+                recordsDiv.innerHTML = recordsHtml;
+            } else {
+                recordsDiv.innerHTML = '<p class="text-muted">No se encontraron registros públicos</p>';
+            }
+            
+            // Data Leaks
+            const leaksDiv = document.getElementById('phoneLeaks');
+            if (data.leaks && data.leaks.length > 0) {
+                let leaksHtml = '';
+                data.leaks.forEach(leak => {
+                    leaksHtml += `
+                        <div class="phone-leak-item">
+                            <strong>${leak.source}</strong>
+                            <p class="mb-1">${leak.title}</p>
+                            <a href="${leak.url}" target="_blank" class="text-danger">Ver filtración</a>
+                        </div>
+                    `;
+                });
+                leaksDiv.innerHTML = leaksHtml;
+            } else {
+                leaksDiv.innerHTML = '<p class="text-muted">No se encontraron filtraciones</p>';
+            }
+            
+            document.getElementById('phoneCard').classList.remove('d-none');
+        }
+
+        async function updateHistory() {
+            try {
+                const response = await fetch('/history');
+                const history = await response.json();
+                
+                const historyDiv = document.getElementById('searchHistory');
+                historyDiv.innerHTML = history.map(search => 
+                    `<div class="history-item">
+                        <strong>${search[1]}</strong>
+                        <small class="text-muted">${new Date(search[2]).toLocaleString()}</small>
+                    </div>`
+                ).join('');
+                
+                document.getElementById('historyCard').classList.remove('d-none');
+            } catch (error) {
+                console.error('Error al cargar el historial:', error);
+            }
+        }
+
+        // Load history on page load
+        updateHistory();
+
+        function searchTelegram() {
+            const query = document.getElementById('email').value;
+            
+            fetch('/search_telegram', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `query=${encodeURIComponent(query)}`
+            })
+            .then(response => response.json())
+            .then(data => displayTelegramResults(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayTelegramResults(data) {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            // Mostrar canales
+            const channelsDiv = document.getElementById('telegramChannels');
+            if (data.channels && data.channels.length > 0) {
+                let channelsHtml = '';
+                data.channels.forEach(channel => {
+                    channelsHtml += `
+                        <div class="telegram-item mb-3">
+                            <h6 class="mb-2">${channel.title}</h6>
+                            <p class="text-muted mb-1">${channel.description}</p>
+                            <p class="mb-1"><strong>Miembros:</strong> ${channel.members}</p>
+                            <a href="${channel.url}" target="_blank" class="btn btn-sm btn-primary">Ver Canal</a>
+                        </div>
+                    `;
+                });
+                channelsDiv.innerHTML = channelsHtml;
+            } else {
+                channelsDiv.innerHTML = '<p class="text-muted">No se encontraron canales públicos</p>';
+            }
+            
+            // Mostrar bots
+            const botsDiv = document.getElementById('telegramBots');
+            if (data.bots && data.bots.length > 0) {
+                let botsHtml = '';
+                data.bots.forEach(bot => {
+                    botsHtml += `
+                        <div class="telegram-item mb-3">
+                            <h6 class="mb-2">${bot.name}</h6>
+                            <p class="text-muted mb-1">${bot.description}</p>
+                            <a href="${bot.url}" target="_blank" class="btn btn-sm btn-success">Ver Bot</a>
+                        </div>
+                    `;
+                });
+                botsDiv.innerHTML = botsHtml;
+            } else {
+                botsDiv.innerHTML = '<p class="text-muted">No se encontraron bots</p>';
+            }
+            
+            // Mostrar stickers
+            const stickersDiv = document.getElementById('telegramStickers');
+            if (data.stickers && data.stickers.length > 0) {
+                let stickersHtml = '';
+                data.stickers.forEach(pack => {
+                    stickersHtml += `
+                        <div class="telegram-item mb-3">
+                            <h6 class="mb-2">${pack.name}</h6>
+                            <a href="${pack.url}" target="_blank" class="btn btn-sm btn-info">Ver Stickers</a>
+                        </div>
+                    `;
+                });
+                stickersDiv.innerHTML = stickersHtml;
+            } else {
+                stickersDiv.innerHTML = '<p class="text-muted">No se encontraron stickers</p>';
+            }
+            
+            document.getElementById('telegramCard').classList.remove('d-none');
+        }
+
+        function check() {
+            const query = document.getElementById('email').value;
+            if (!query) return;
+            
+            // Realizar búsqueda normal
+            fetch('/check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent(query)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.type === 'phone') {
+                    displayPhoneResults(data.phone_info);
+                } else {
+                    displayResults(data);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            
+            // Realizar búsqueda en Telegram
+            searchTelegram();
+        }
+    </script>
+</body>
+</html>
