@@ -1,4 +1,4 @@
-# Checker App
+# Checker App  (WiFiway)
 
 Una aplicación web para buscar y analizar información pública de manera ética y legal.
 
